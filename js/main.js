@@ -9,7 +9,8 @@ $(document).ready(function () {
         success: function (data) {
             var dataApi = data;
             //console.log(dataApi);
-            var oggettoIntermedio = {};
+            var oggettoIntermedioLine = {};
+            var oggettoIntermedioPie = {};
 
             for (var i = 0; i < dataApi.length; i++) {
                 var oggettoSingolo = dataApi[i];
@@ -18,36 +19,52 @@ $(document).ready(function () {
                 //console.log(salesman);
                 var amount = oggettoSingolo.amount;
                 //console.log(amount);
-                var date = oggettoSingolo.date;
-                //console.log(date);
+                var date = moment(oggettoSingolo.date, 'DD/MM/YYYY') // 10/02/2017
+                var mese = date.format('MMMM');
+                //console.log(oggettoSingolo.date, date, mese);
                 var id = oggettoSingolo.id;
                 //console.log(id);
 
-                if (oggettoIntermedio[salesman] === undefined) {
-                    oggettoIntermedio[salesman] = 0;
+                if (oggettoIntermedioLine[mese] === undefined) {
+                    oggettoIntermedioLine[mese] = 0;
                 }
-                oggettoIntermedio[salesman] += amount;
-                //console.log(oggettoIntermedio);
+                oggettoIntermedioLine[mese] += amount;
+                //console.log(oggettoIntermedioLine);
+
+                if (oggettoIntermedioPie[salesman] === undefined) {
+                    oggettoIntermedioPie[salesman] = 0;
+                }
+                oggettoIntermedioPie[salesman] += amount;
+                //console.log(oggettoIntermedioPie);
             }
 
             var salesmanArray = [];
-            var amountArray = [];
+            var meseArray = [];
+            var amountArrayLine = [];
+            var amountArrayPie = [];
 
-            for (var key in oggettoIntermedio) {
-                    salesmanArray.push(key);
-                    amountArray.push(oggettoIntermedio[key]);
+            for (var key in oggettoIntermedioLine) {
+                    meseArray.push(key);
+                    amountArrayLine.push(oggettoIntermedioLine[key]);
                 }
+
+            for (var key in oggettoIntermedioPie) {
+                    salesmanArray.push(key);
+                    amountArrayPie.push(oggettoIntermedioPie[key]);
+                }
+
             //console.log(salesmanArray);
             //console.log(amountArray);
 
-            newChart(salesmanArray, amountArray)
+            newLineChart(meseArray, amountArrayLine)
+            newPieChart(salesmanArray, amountArrayPie)
         },
         error: function () {
 
         }
     });
 
-    function newChart(labels, data) {
+    function newLineChart(labels, data) {
         var ctx = $('#myChart');
         var chart = new Chart(ctx, {
             type: 'line',
@@ -55,8 +72,29 @@ $(document).ready(function () {
                 labels: labels,
                 datasets: [{
                     label: 'My First dataset',
-                    backgroundColor: 'rgb(255, 99, 132)',
-                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: '#18737b',
+                    borderColor: '#cdd741',
+                    data: data // amount
+                }]
+            },
+        });
+    }
+
+    function newPieChart(labels, data) {
+        var ctx = $('#mySecondChart');
+        var chart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'My First dataset',
+                    backgroundColor: [
+                        'darkorange',
+                        'darkgreen',
+                        '#18737b',
+                        'darkred'
+                    ],
+                    borderColor: '#cdd741',
                     data: data // amount
                 }]
             },
