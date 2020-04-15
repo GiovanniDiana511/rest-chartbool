@@ -5,6 +5,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/it.js"></script>
         <link rel="stylesheet" href="css/style.css">
         <title>Chartbool</title>
     </head>
@@ -12,6 +13,14 @@
 
         <div class="container">
             <div class="container-inner">
+                <div class="invia-dati">
+                    <select id="sel-venditore" name="">
+                        <option value="Giuseppe">Giuseppe</option>
+                    </select>
+                    <input id="input-data" type="date" value="2017-01-01" min="2017-01-01" max="2017-12-31">
+                    <input id="input-vendita" type="number" value="1000">
+                    <button id="btn-invia" type="button" name="button">Invia</button>
+                </div>
                 <canvas id="myChart"></canvas>
             </div>
         </div>

@@ -1,67 +1,93 @@
 $(document).ready(function () {
 
-    $.ajax({
-        url: "http://157.230.17.132:4006/sales",
-        data: {
+    var baseUrl = "http://157.230.17.132:4006/sales";
 
-        },
-        method: 'GET',
-        success: function (data) {
-            var dataApi = data;
-            //console.log(dataApi);
-            var oggettoIntermedioLine = {};
-            var oggettoIntermedioPie = {};
+    function stampaGrafici() {
+        $.ajax({
+            url: baseUrl,
+            data: {
 
-            for (var i = 0; i < dataApi.length; i++) {
-                var oggettoSingolo = dataApi[i];
-                //console.log(oggettoSingolo);
-                var salesman = oggettoSingolo.salesman;
-                //console.log(salesman);
-                var amount = oggettoSingolo.amount;
-                //console.log(amount);
-                var date = moment(oggettoSingolo.date, 'DD/MM/YYYY') // 10/02/2017
-                var mese = date.format('MMMM');
-                //console.log(oggettoSingolo.date, date, mese);
-                var id = oggettoSingolo.id;
-                //console.log(id);
+            },
+            method: 'GET',
+            success: function (data) {
+                var dataApi = data;
+                //console.log(dataApi);
+                var oggettoIntermedioLine = {};
+                var oggettoIntermedioPie = {};
 
-                if (oggettoIntermedioLine[mese] === undefined) {
-                    oggettoIntermedioLine[mese] = 0;
+                for (var i = 0; i < dataApi.length; i++) {
+                    var oggettoSingolo = dataApi[i];
+                    //console.log(oggettoSingolo);
+                    var salesman = oggettoSingolo.salesman;
+                    //console.log(salesman);
+                    var amount = oggettoSingolo.amount;
+                    //console.log(amount);
+                    var date = moment(oggettoSingolo.date, 'DD/MM/YYYY') // 10/02/2017
+                    var mese = date.format('MMMM');
+                    //console.log(oggettoSingolo.date, date, mese);
+                    var id = oggettoSingolo.id;
+                    //console.log(id);
+
+                    if (oggettoIntermedioLine[mese] === undefined) {
+                        oggettoIntermedioLine[mese] = 0;
+                    }
+                    oggettoIntermedioLine[mese] += amount;
+                    //console.log(oggettoIntermedioLine);
+
+                    if (oggettoIntermedioPie[salesman] === undefined) {
+                        oggettoIntermedioPie[salesman] = 0;
+                    }
+                    oggettoIntermedioPie[salesman] += amount;
+                    //console.log(oggettoIntermedioPie);
                 }
-                oggettoIntermedioLine[mese] += amount;
-                //console.log(oggettoIntermedioLine);
 
-                if (oggettoIntermedioPie[salesman] === undefined) {
-                    oggettoIntermedioPie[salesman] = 0;
-                }
-                oggettoIntermedioPie[salesman] += amount;
-                //console.log(oggettoIntermedioPie);
+                var salesmanArray = [];
+                var meseArray = [];
+                var amountArrayLine = [];
+                var amountArrayPie = [];
+
+                for (var key in oggettoIntermedioLine) {
+                        meseArray.push(key);
+                        amountArrayLine.push(oggettoIntermedioLine[key]);
+                    }
+
+                for (var key in oggettoIntermedioPie) {
+                        salesmanArray.push(key);
+                        amountArrayPie.push(oggettoIntermedioPie[key]);
+                        //amountArrayPie.push((oggettoIntermedioPie[key] / amount) * 100).toFixed(2);    ?
+                    }
+
+                //console.log(amountArrayPie);
+                //console.log(salesmanArray);
+                //console.log(amountArray);
+
+                newLineChart(meseArray, amountArrayLine)
+                newPieChart(salesmanArray, amountArrayPie)
+            },
+            error: function (err) {
+                alert("Errore" + err);
             }
+        });
+    };
 
-            var salesmanArray = [];
-            var meseArray = [];
-            var amountArrayLine = [];
-            var amountArrayPie = [];
+    $("#btn-invia").click(function () {
+        var nomeVenditore = $("#sel-venditore").val();
+        var dataVendita = $("#input-data").val();
+        var dataVenditaFormattata = moment(dataVendita, "YYYY-MM-DD").format("DD/MM/YYYY");
+        var vendita = parseInt($("#input-vendita").val());
 
-            for (var key in oggettoIntermedioLine) {
-                    meseArray.push(key);
-                    amountArrayLine.push(oggettoIntermedioLine[key]);
-                }
-
-            for (var key in oggettoIntermedioPie) {
-                    salesmanArray.push(key);
-                    amountArrayPie.push(oggettoIntermedioPie[key]);
-                }
-
-            //console.log(salesmanArray);
-            //console.log(amountArray);
-
-            newLineChart(meseArray, amountArrayLine)
-            newPieChart(salesmanArray, amountArrayPie)
-        },
-        error: function () {
-
-        }
+        $.ajax({
+            url: baseUrl,
+            method: 'POST',
+            data: {
+                salesman: nomeVenditore,
+                amount: vendita,
+                date: dataVenditaFormattata
+            },
+            success: function (data) {
+                console.log(data);
+            }
+        })
     });
 
     function newLineChart(labels, data) {
